@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
+	"github.com/funxdata/wechat"
+	"github.com/funxdata/wechat/message"
 	"github.com/gin-gonic/gin"
-	"github.com/silenceper/wechat"
-	"github.com/silenceper/wechat/message"
 )
 
 func main() {

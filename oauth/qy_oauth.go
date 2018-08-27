@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/silenceper/wechat/util"
+	"github.com/funxdata/wechat/util"
 )
 
 var (

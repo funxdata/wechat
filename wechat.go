@@ -4,16 +4,17 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/silenceper/wechat/cache"
-	"github.com/silenceper/wechat/context"
-	"github.com/silenceper/wechat/js"
-	"github.com/silenceper/wechat/material"
-	"github.com/silenceper/wechat/menu"
-	"github.com/silenceper/wechat/oauth"
-	"github.com/silenceper/wechat/pay"
-	"github.com/silenceper/wechat/server"
-	"github.com/silenceper/wechat/template"
-	"github.com/silenceper/wechat/user"
+	"github.com/funxdata/wechat/cache"
+	"github.com/funxdata/wechat/context"
+	"github.com/funxdata/wechat/js"
+	"github.com/funxdata/wechat/material"
+	"github.com/funxdata/wechat/menu"
+	"github.com/funxdata/wechat/oauth"
+	"github.com/funxdata/wechat/pay"
+	"github.com/funxdata/wechat/qr"
+	"github.com/funxdata/wechat/server"
+	"github.com/funxdata/wechat/template"
+	"github.com/funxdata/wechat/user"
 )
 
 // Wechat struct
@@ -23,13 +24,13 @@ type Wechat struct {
 
 // Config for user
 type Config struct {
-	AppID          string
-	AppSecret      string
-	Token          string
-	EncodingAESKey string
-	PayMchID       string //支付 - 商户 ID
-	PayNotifyURL   string //支付 - 接受微信支付结果通知的接口地址
-	PayKey         string //支付 - 商户后台设置的支付 key
+	AppID          string `yaml:"appID"`
+	AppSecret      string `yaml:"appSecret"`
+	Token          string `yaml:"token"`
+	EncodingAESKey string `yaml:"encodingAESKey"`
+	PayMchID       string `yaml:"payMchID"`     //支付 - 商户 ID
+	PayNotifyURL   string `yaml:"payNotifyURL"` //支付 - 接受微信支付结果通知的接口地址
+	PayKey         string `yaml:"payKey"`       //支付 - 商户后台设置的支付 key
 	Cache          cache.Cache
 }
 
@@ -98,4 +99,9 @@ func (wc *Wechat) GetTemplate() *template.Template {
 // GetPay 返回支付消息的实例
 func (wc *Wechat) GetPay() *pay.Pay {
 	return pay.NewPay(wc.Context)
+}
+
+// GetQR
+func (wc *Wechat) GetQR() *qr.QR {
+	return qr.NewQR(wc.Context)
 }
