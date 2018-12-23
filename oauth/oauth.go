@@ -56,6 +56,7 @@ type ResAccessToken struct {
 	RefreshToken string `json:"refresh_token"`
 	OpenID       string `json:"openid"`
 	Scope        string `json:"scope"`
+	UnionID      string `json:"unionid"`
 }
 
 // GetUserAccessToken 通过网页授权的code 换取access_token(区别于context中的access_token)

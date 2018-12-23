@@ -46,8 +46,8 @@ type Info struct {
 	GroupID       int32  `json:"groupid" gorm:"column:groupid"`
 }
 
-//UserList 用户openid列表
-type UserList struct {
+// OpenidList 用户openid列表
+type OpenidList struct {
 	Total int `json:"total"`
 	Count int `json:"count"`
 	Data  struct {
