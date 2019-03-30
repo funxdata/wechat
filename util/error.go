@@ -23,3 +23,16 @@ func DecodeWithCommonError(response []byte, apiName string) (err error) {
 	}
 	return nil
 }
+
+// Error 返回错误信息
+func (c CommonError) Err() error {
+	if c.ErrCode > 0 {
+		return fmt.Errorf("[%v] %s", c.ErrCode, c.ErrMsg)
+	}
+	return nil
+}
+
+// IsInvalidCredential ...
+func (c CommonError) IsInvalidCredential() bool {
+	return c.ErrCode == 40001
+}

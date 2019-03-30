@@ -81,8 +81,11 @@ func (q *QR) GetStrQRTicket(exp time.Duration, str string) (t *Ticket, err error
 	if err != nil {
 		return
 	}
-	if t.CommonError.ErrCode > 0 {
-		err = fmt.Errorf("[%v] %s", t.CommonError.ErrCode, t.CommonError.ErrMsg)
+	if e := t.CommonError.Err(); e != nil {
+		err = err
+		if t.CommonError.IsInvalidCredential() {
+			q.GetAccessTokenFromServer()
+		}
 	}
 	return
 }
