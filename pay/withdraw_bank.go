@@ -77,8 +77,8 @@ type BankResponse struct {
 
 // NewWithdrawBank return an instance of Bank package
 func NewWithdrawBank(ctx *context.Context) *Bank {
-	pay := Bank{Context: ctx}
-	return &pay
+	pay := &Bank{Context: ctx}
+	return pay
 }
 
 // PreBankOrder return data for invoke wechat payment

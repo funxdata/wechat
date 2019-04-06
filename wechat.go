@@ -101,6 +101,11 @@ func (wc *Wechat) GetPay() *pay.Pay {
 	return pay.NewPay(wc.Context)
 }
 
+// GetBankPay 返回银行卡提现的实例
+func (wc *Wechat) GetBankPay() *pay.Bank {
+	return pay.NewWithdrawBank(wc.Context)
+}
+
 // GetQR
 func (wc *Wechat) GetQR() *qr.QR {
 	return qr.NewQR(wc.Context)
