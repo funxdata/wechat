@@ -3,7 +3,7 @@ package qr
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
+	"reflect"
 	"time"
 
 	"github.com/funxdata/wechat/context"
@@ -11,65 +11,58 @@ import (
 )
 
 const (
-	tmpQRCreateURL = "https://api.weixin.qq.com/cgi-bin/qrcode/create"
-	qrImgURL       = "https://mp.weixin.qq.com/cgi-bin/showqrcode"
+	qrCreateURL = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s"
+	getQRImgURL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s"
 )
 
-//QR 模板消息
+const (
+	actionID  = "QR_SCENE"
+	actionStr = "QR_STR_SCENE"
+
+	actionLimitID  = "QR_LIMIT_SCENE"
+	actionLimitStr = "QR_LIMIT_STR_SCENE"
+)
+
+// QR 二维码
 type QR struct {
 	*context.Context
 }
 
-//NewQR 实例化
+//NewQR 二维码实例
 func NewQR(context *context.Context) *QR {
 	q := new(QR)
 	q.Context = context
 	return q
 }
 
-const (
-	actionId  = "QR_SCENE"
-	actionStr = "QR_STR_SCENE"
-)
-
-type TmpQR struct {
-	ExpireSeconds int    `json:"expire_seconds"`
+// Request 临时二维码
+type Request struct {
+	ExpireSeconds int64  `json:"expire_seconds,omitempty"`
 	ActionName    string `json:"action_name"`
 	ActionInfo    struct {
 		Scene struct {
 			SceneStr string `json:"scene_str,omitempty"`
-			SceneId  int    `json:"scene_id,omitempty"`
+			SceneID  int    `json:"scene_id,omitempty"`
 		} `json:"scene"`
 	} `json:"action_info"`
 }
 
+// Ticket 二维码ticket
 type Ticket struct {
 	util.CommonError `json:",inline"`
 	Ticket           string `json:"ticket"`
-	ExpireSeconds    int    `json:"expire_seconds"`
-	url              string `json:"url"`
+	ExpireSeconds    int64  `json:"expire_seconds"`
+	URL              string `json:"url"`
 }
 
-func newStrTmpQrRequest(exp time.Duration, str string) *TmpQR {
-	tq := &TmpQR{
-		ExpireSeconds: int(exp.Seconds()),
-		ActionName:    actionStr,
-	}
-	tq.ActionInfo.Scene.SceneStr = str
-
-	return tq
-}
-
-//Ticket 获取QR Ticket
-func (q *QR) GetStrQRTicket(exp time.Duration, str string) (t *Ticket, err error) {
-	tq := newStrTmpQrRequest(exp, str)
-
-	var accessToken string
-	accessToken, err = q.GetAccessToken()
+// GetQRTicket 获取二维码 Ticket
+func (q *QR) GetQRTicket(tq *Request) (t *Ticket, err error) {
+	accessToken, err := q.GetAccessToken()
 	if err != nil {
 		return
 	}
-	uri := fmt.Sprintf("%s?access_token=%s", tmpQRCreateURL, accessToken)
+
+	uri := fmt.Sprintf(qrCreateURL, accessToken)
 	response, err := util.PostJSON(uri, tq)
 	if err != nil {
 		err = fmt.Errorf("get qr ticket failed, %s", err)
@@ -81,19 +74,49 @@ func (q *QR) GetStrQRTicket(exp time.Duration, str string) (t *Ticket, err error
 	if err != nil {
 		return
 	}
-	if e := t.CommonError.Err(); e != nil {
-		err = err
-		if t.CommonError.IsInvalidCredential() {
-			q.GetAccessTokenFromServer()
-		}
-	}
+
 	return
 }
 
+// ShowQRCode 通过ticket换取二维码
 func ShowQRCode(tk *Ticket) string {
-	u, _ := url.Parse(qrImgURL)
-	q := u.Query()
-	q.Set("ticket", tk.Ticket)
-	u.RawQuery = q.Encode()
-	return u.String()
+	return fmt.Sprintf(getQRImgURL, tk.Ticket)
+}
+
+// NewTmpQrRequest 新建临时二维码请求实例
+func NewTmpQrRequest(exp time.Duration, scene interface{}) *Request {
+	tq := &Request{
+		ExpireSeconds: int64(exp.Seconds()),
+	}
+	switch reflect.ValueOf(scene).Kind() {
+	case reflect.String:
+		tq.ActionName = actionStr
+		tq.ActionInfo.Scene.SceneStr = scene.(string)
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64:
+		tq.ActionName = actionID
+		tq.ActionInfo.Scene.SceneID = scene.(int)
+	}
+
+	return tq
+}
+
+// NewLimitQrRequest 新建永久二维码请求实例
+func NewLimitQrRequest(scene interface{}) *Request {
+	tq := &Request{}
+	switch reflect.ValueOf(scene).Kind() {
+	case reflect.String:
+		tq.ActionName = actionLimitStr
+		tq.ActionInfo.Scene.SceneStr = scene.(string)
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64:
+		tq.ActionName = actionLimitID
+		tq.ActionInfo.Scene.SceneID = scene.(int)
+	}
+
+	return tq
 }

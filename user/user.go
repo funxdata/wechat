@@ -44,6 +44,11 @@ type Info struct {
 	UnionID       string `json:"unionid" gorm:"column:unionid"`
 	Remark        string `json:"remark"`
 	GroupID       int32  `json:"groupid" gorm:"column:groupid"`
+
+	TagidList      []int32 `json:"tagid_list"`
+	SubscribeScene string  `json:"subscribe_scene"`
+	QrScene        int     `json:"qr_scene"`
+	QrSceneStr     string  `json:"qr_scene_str"`
 }
 
 // OpenidList 用户openid列表

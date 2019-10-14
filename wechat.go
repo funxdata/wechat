@@ -9,6 +9,7 @@ import (
 	"github.com/funxdata/wechat/js"
 	"github.com/funxdata/wechat/material"
 	"github.com/funxdata/wechat/menu"
+	"github.com/funxdata/wechat/miniprogram"
 	"github.com/funxdata/wechat/oauth"
 	"github.com/funxdata/wechat/pay"
 	"github.com/funxdata/wechat/qr"
@@ -106,7 +107,12 @@ func (wc *Wechat) GetBankPay() *pay.Bank {
 	return pay.NewWithdrawBank(wc.Context)
 }
 
-// GetQR
+// GetQR 返回二维码的实例
 func (wc *Wechat) GetQR() *qr.QR {
 	return qr.NewQR(wc.Context)
+}
+
+// GetMiniProgram 获取小程序的实例
+func (wc *Wechat) GetMiniProgram() *miniprogram.MiniProgram {
+	return miniprogram.NewMiniProgram(wc.Context)
 }
