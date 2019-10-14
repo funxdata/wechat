@@ -49,17 +49,33 @@ type Request struct {
 
 // Ticket 二维码ticket
 type Ticket struct {
-	util.CommonError `json:",inline"`
-	Ticket           string `json:"ticket"`
-	ExpireSeconds    int64  `json:"expire_seconds"`
-	URL              string `json:"url"`
+	util.CommonError
+	Ticket        string `json:"ticket"`
+	ExpireSeconds int64  `json:"expire_seconds"`
+	URL           string `json:"url"`
 }
 
 // GetQRTicket 获取二维码 Ticket
-func (q *QR) GetQRTicket(tq *Request) (t *Ticket, err error) {
+func (q *QR) GetQRTicket(scene interface{}, exp ...time.Duration) (t *Ticket, err error) {
 	accessToken, err := q.GetAccessToken()
 	if err != nil {
 		return
+	}
+
+	tq := &Request{}
+	if len(exp) > 0 && exp[0].Seconds() > 1 {
+		tq.ExpireSeconds = int64(exp[0].Seconds())
+	}
+	switch reflect.ValueOf(scene).Kind() {
+	case reflect.String:
+		tq.ActionName = actionStr
+		tq.ActionInfo.Scene.SceneStr = scene.(string)
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64:
+		tq.ActionName = actionID
+		tq.ActionInfo.Scene.SceneID = scene.(int)
 	}
 
 	uri := fmt.Sprintf(qrCreateURL, accessToken)
@@ -81,42 +97,4 @@ func (q *QR) GetQRTicket(tq *Request) (t *Ticket, err error) {
 // ShowQRCode 通过ticket换取二维码
 func ShowQRCode(tk *Ticket) string {
 	return fmt.Sprintf(getQRImgURL, tk.Ticket)
-}
-
-// NewTmpQrRequest 新建临时二维码请求实例
-func NewTmpQrRequest(exp time.Duration, scene interface{}) *Request {
-	tq := &Request{
-		ExpireSeconds: int64(exp.Seconds()),
-	}
-	switch reflect.ValueOf(scene).Kind() {
-	case reflect.String:
-		tq.ActionName = actionStr
-		tq.ActionInfo.Scene.SceneStr = scene.(string)
-	case reflect.Int, reflect.Int8, reflect.Int16,
-		reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16,
-		reflect.Uint32, reflect.Uint64:
-		tq.ActionName = actionID
-		tq.ActionInfo.Scene.SceneID = scene.(int)
-	}
-
-	return tq
-}
-
-// NewLimitQrRequest 新建永久二维码请求实例
-func NewLimitQrRequest(scene interface{}) *Request {
-	tq := &Request{}
-	switch reflect.ValueOf(scene).Kind() {
-	case reflect.String:
-		tq.ActionName = actionLimitStr
-		tq.ActionInfo.Scene.SceneStr = scene.(string)
-	case reflect.Int, reflect.Int8, reflect.Int16,
-		reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16,
-		reflect.Uint32, reflect.Uint64:
-		tq.ActionName = actionLimitID
-		tq.ActionInfo.Scene.SceneID = scene.(int)
-	}
-
-	return tq
 }
