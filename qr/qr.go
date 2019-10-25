@@ -90,6 +90,9 @@ func (q *QR) GetQRTicket(scene interface{}, exp ...time.Duration) (t *Ticket, er
 	if err != nil {
 		return
 	}
+	if t.CommonError.IsInvalidCredential() {
+		q.GetAccessTokenFromServer()
+	}
 
 	return
 }
