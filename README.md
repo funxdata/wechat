@@ -99,6 +99,7 @@ Cache主要用来保存全局access_token以及js-sdk中的ticket：
 	- 获取js-sdk配置
 - [素材管理](#素材管理)
 - [小程序开发](#小程序开发)
+- [小程序-云开发](./tcb)
 
 ## 消息管理
 
@@ -285,8 +286,8 @@ type Reply struct {
 ####  回复图片消息
 ```go
 //mediaID 可通过素材管理-上上传多媒体文件获得
-image :=message.NewVideo("mediaID")
-return &message.Reply{message.MsgTypeVideo, image}
+image :=message.NewImage("mediaID")
+return &message.Reply{message.MsgTypeImage, image}
 ```
 ####  回复视频消息
 ```go

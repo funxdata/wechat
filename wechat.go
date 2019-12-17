@@ -6,15 +6,17 @@ import (
 
 	"github.com/funxdata/wechat/cache"
 	"github.com/funxdata/wechat/context"
+	"github.com/funxdata/wechat/device"
 	"github.com/funxdata/wechat/js"
 	"github.com/funxdata/wechat/material"
 	"github.com/funxdata/wechat/menu"
+	"github.com/funxdata/wechat/message"
 	"github.com/funxdata/wechat/miniprogram"
 	"github.com/funxdata/wechat/oauth"
 	"github.com/funxdata/wechat/pay"
 	"github.com/funxdata/wechat/qr"
 	"github.com/funxdata/wechat/server"
-	"github.com/funxdata/wechat/template"
+	"github.com/funxdata/wechat/tcb"
 	"github.com/funxdata/wechat/user"
 )
 
@@ -93,8 +95,8 @@ func (wc *Wechat) GetUser() *user.User {
 }
 
 // GetTemplate 模板消息接口
-func (wc *Wechat) GetTemplate() *template.Template {
-	return template.NewTemplate(wc.Context)
+func (wc *Wechat) GetTemplate() *message.Template {
+	return message.NewTemplate(wc.Context)
 }
 
 // GetPay 返回支付消息的实例
@@ -115,4 +117,14 @@ func (wc *Wechat) GetQR() *qr.QR {
 // GetMiniProgram 获取小程序的实例
 func (wc *Wechat) GetMiniProgram() *miniprogram.MiniProgram {
 	return miniprogram.NewMiniProgram(wc.Context)
+}
+
+// GetDevice 获取智能设备的实例
+func (wc *Wechat) GetDevice() *device.Device {
+	return device.NewDevice(wc.Context)
+}
+
+// GetTcb 获取小程序-云开发的实例
+func (wc *Wechat) GetTcb() *tcb.Tcb {
+	return tcb.NewTcb(wc.Context)
 }
