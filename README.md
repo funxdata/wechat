@@ -47,10 +47,6 @@ server.Send()
 - Beego: [./examples/beego/beego.go](./examples/beego/beego.go)
 - Gin Framework: [./examples/gin/gin.go](./examples/gin/gin.go)
 
-## 交流群：
-![关注公众号入群交流](https://silenceper.oss-cn-beijing.aliyuncs.com/qrcode/qr_code_study_program_258.jpg)
->关注公众号并回复“入群”
-
 ## 基本配置
 
 ```go
