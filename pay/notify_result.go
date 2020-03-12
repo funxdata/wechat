@@ -11,6 +11,12 @@ import (
 // NotifyResult 下单回调
 type NotifyResult map[string]string
 
+// NotifyResp 消息通知返回
+type NotifyResp struct {
+	ReturnCode string `xml:"return_code"`
+	ReturnMsg  string `xml:"return_msg"`
+}
+
 type xmlMapEntry struct {
 	XMLName xml.Name
 	Value   string `xml:",chardata"`
