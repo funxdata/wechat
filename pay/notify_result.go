@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"io"
 	"sort"
+	"strconv"
 
 	"github.com/funxdata/wechat/util"
 )
@@ -37,6 +38,48 @@ func (m *NotifyResult) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		(*m)[e.XMLName.Local] = e.Value
 	}
 	return nil
+}
+
+func (n NotifyResult) ReturnCode() string    { return n["return_code"] }
+func (n NotifyResult) ReturnMsg() string     { return n["return_msg"] }
+func (n NotifyResult) ResultCode() string    { return n["result_code"] }
+func (n NotifyResult) OpenID() string        { return n["openid"] }
+func (n NotifyResult) IsSubscribe() string   { return n["is_subscribe"] }
+func (n NotifyResult) TradeType() string     { return n["trade_type"] }
+func (n NotifyResult) BankType() string      { return n["bank_type"] }
+func (n NotifyResult) TotalFee() int         { return mustParseInt(n["total_fee"]) }
+func (n NotifyResult) FeeType() string       { return n["fee_type"] }
+func (n NotifyResult) CashFee() int          { return mustParseInt(n["cash_fee"]) }
+func (n NotifyResult) CashFeeType() string   { return n["cash_fee_type"] }
+func (n NotifyResult) TransactionID() string { return n["transaction_id"] }
+func (n NotifyResult) OutTradeNo() string    { return n["out_trade_no"] }
+func (n NotifyResult) Attach() string        { return n["attach"] }
+func (n NotifyResult) TimeEnd() string       { return n["time_end"] }
+
+// IsSucc 返回是否为成功
+func (n NotifyResult) IsSucc() bool { return n.ResultCode() == "SUCCESS" && n.ReturnCode() == "SUCCESS" }
+
+func mustParseInt(val string) int {
+	n, _ := strconv.Atoi(val)
+	return n
+}
+
+// NewNotifyResp 商户处理后同步返回给微信的参数
+func NewNotifyResp(isSucc bool, msg ...string) *NotifyResp {
+	if isSucc {
+		return &NotifyResp{
+			ReturnCode: "SUCCESS",
+			ReturnMsg:  "OK",
+		}
+	}
+	rmsg := "FAILED"
+	if len(msg) > 0 && msg[0] != "" {
+		rmsg = msg[0]
+	}
+	return &NotifyResp{
+		ReturnCode: "FAILED",
+		ReturnMsg:  rmsg,
+	}
 }
 
 // VerifySign 验签
