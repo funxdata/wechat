@@ -27,14 +27,14 @@ type Wechat struct {
 
 // Config for user
 type Config struct {
-	AppID          string `yaml:"appID"`
-	AppSecret      string `yaml:"appSecret"`
-	Token          string `yaml:"token"`
-	EncodingAESKey string `yaml:"encodingAESKey"`
-	PayMchID       string `yaml:"payMchID"`     //支付 - 商户 ID
-	PayNotifyURL   string `yaml:"payNotifyURL"` //支付 - 接受微信支付结果通知的接口地址
-	PayKey         string `yaml:"payKey"`       //支付 - 商户后台设置的支付 key
-	Cache          cache.Cache
+	AppID          string      `yaml:"appID" json:"appid,omitempty"`
+	AppSecret      string      `yaml:"appSecret" json:"app_secret,omitempty"`
+	Token          string      `yaml:"token" json:"token,omitempty"`
+	EncodingAESKey string      `yaml:"encodingAESKey" json:"encoding_aes_key,omitempty"`
+	PayMchID       string      `yaml:"payMchID" json:"pay_mchid,omitempty"`          //支付 - 商户 ID
+	PayNotifyURL   string      `yaml:"payNotifyURL" json:"pay_notify_url,omitempty"` //支付 - 接受微信支付结果通知的接口地址
+	PayKey         string      `yaml:"payKey" json:"pay_key,omitempty"`              //支付 - 商户后台设置的支付 key
+	Cache          cache.Cache `yaml:"-" json:"-"`
 }
 
 // NewWechat init
