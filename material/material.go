@@ -14,6 +14,9 @@ const (
 	addMaterialURL = "https://api.weixin.qq.com/cgi-bin/material/add_material"
 	delMaterialURL = "https://api.weixin.qq.com/cgi-bin/material/del_material"
 	getMaterialURL = "https://api.weixin.qq.com/cgi-bin/material/get_material"
+
+	countMaterialURL = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount"
+	listMaterialURL  = "https://api.weixin.qq.com/cgi-bin/material/batchget_material"
 )
 
 //Material 素材管理
@@ -40,6 +43,8 @@ type Article struct {
 	ContentSourceURL string `json:"content_source_url"`
 	URL              string `json:"url"`
 	DownURL          string `json:"down_url"`
+
+	NewsItem []*Article `json:"news_item"`
 }
 
 // GetNews 获取/下载永久素材
@@ -215,4 +220,85 @@ func (material *Material) DeleteMaterial(mediaID string) error {
 	}
 
 	return util.DecodeWithCommonError(response, "DeleteMaterial")
+}
+
+// MaterialCount 永久素材总数
+type MaterialCount struct {
+	util.CommonError
+
+	VoiceCount int `json:"voice_count"`
+	VideoCount int `json:"video_count"`
+	ImageCount int `json:"image_count"`
+	NewsCount  int `json:"news_count"`
+}
+
+// CountMaterial 获取永久素材的总数
+func (material *Material) CountMaterial() (*MaterialCount, error) {
+	accessToken, err := material.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := fmt.Sprintf("%s?access_token=%s", countMaterialURL, accessToken)
+	response, err := util.HTTPGet(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := &MaterialCount{}
+	err = json.Unmarshal(response, ret)
+	if err != nil {
+		return nil, err
+	}
+
+	if ret.ErrCode != 0 {
+		return nil, fmt.Errorf("GetMenu Error , errcode=%d , errmsg=%s", ret.ErrCode, ret.ErrMsg)
+
+	}
+	return ret, nil
+}
+
+type MaterialList struct {
+	util.CommonError
+	TotalCount int             `json:"total_count"`
+	ItemCount  int             `json:"item_count"`
+	Items      []*MaterialItem `json:"item"`
+}
+
+type MaterialItem struct {
+	MediaID    string  `json:"media_id"`
+	UpdateTime int64   `json:"update_time"`
+	Content    Article `json:"content"`
+}
+
+// ListMaterial 获取永久素材的列表
+func (material *Material) ListMaterial(typ MediaType, offset, count int) (*MaterialList, error) {
+	in := map[string]interface{}{
+		"type":   typ,
+		"offset": offset,
+		"count":  count,
+	}
+
+	accessToken, err := material.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := fmt.Sprintf("%s?access_token=%s", listMaterialURL, accessToken)
+	response, err := util.PostJSON(uri, in)
+	if err != nil {
+		return nil, err
+	}
+
+	ret := &MaterialList{}
+	err = json.Unmarshal(response, ret)
+	if err != nil {
+		return nil, err
+	}
+
+	if ret.ErrCode != 0 {
+		return nil, fmt.Errorf("GetMenu Error , errcode=%d , errmsg=%s", ret.ErrCode, ret.ErrMsg)
+
+	}
+	return ret, nil
 }
