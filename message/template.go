@@ -10,6 +10,7 @@ import (
 
 const (
 	templateSendURL = "https://api.weixin.qq.com/cgi-bin/message/template/send"
+	templateListURL = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template"
 )
 
 //Template 模板消息
@@ -71,4 +72,42 @@ func (tpl *Template) Send(msg *Message) (msgID int64, err error) {
 	}
 	msgID = result.MsgID
 	return
+}
+
+// TemplateItem 模板信息列表元素
+type TemplateItem struct {
+	TemplateID      string `json:"template_id"`
+	Title           string `json:"title"`
+	PrimaryIndustry string `json:"primary_industry"`
+	DeputyIndustry  string `json:"deputy_industry"`
+	Content         string `json:"content"`
+	Example         string `json:"example"`
+}
+
+// ListAllTemplate 获取模板列表
+func (tpl *Template) ListAllTemplate() ([]*TemplateItem, error) {
+	accessToken, err := tpl.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	uri := fmt.Sprintf("%s?access_token=%s", templateListURL, accessToken)
+	response, err := util.HTTPGet(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	var ret struct {
+		util.CommonError
+		Items []*TemplateItem `json:"template_list"`
+	}
+	err = json.Unmarshal(response, &ret)
+	if err != nil {
+		return nil, err
+	}
+
+	if ret.ErrCode > 0 {
+		return nil, fmt.Errorf("template msg list error : errcode=%v , errmsg=%v", ret.ErrCode, ret.ErrMsg)
+	}
+
+	return ret.Items, nil
 }
