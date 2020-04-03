@@ -72,6 +72,21 @@ func (material *Material) GetNews(id string) ([]*Article, error) {
 	return res.NewsItem, nil
 }
 
+// GetMaterial 获取永久素材资源
+func (material *Material) GetMaterial(id string) ([]byte, error) {
+	accessToken, err := material.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	uri := fmt.Sprintf("%s?access_token=%s", getMaterialURL, accessToken)
+
+	var req struct {
+		MediaID string `json:"media_id"`
+	}
+	req.MediaID = id
+	return util.PostJSON(uri, req)
+}
+
 //reqArticles 永久性图文素材请求信息
 type reqArticles struct {
 	Articles []*Article `json:"articles"`
@@ -266,9 +281,11 @@ type MaterialList struct {
 }
 
 type MaterialItem struct {
-	MediaID    string  `json:"media_id"`
-	UpdateTime int64   `json:"update_time"`
-	Content    Article `json:"content"`
+	MediaID    string   `json:"media_id"`
+	UpdateTime int64    `json:"update_time"`
+	URL        string   `json:"url,omitempty"`
+	Name       string   `json:"name,omitempty"`
+	Content    *Article `json:"content,omitempty"`
 }
 
 // ListMaterial 获取永久素材的列表

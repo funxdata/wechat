@@ -97,6 +97,7 @@ func (material *Material) ImageUpload(filename string) (url string, err error) {
 	if err != nil {
 		return
 	}
+
 	var image resMediaImage
 	err = json.Unmarshal(response, &image)
 	if err != nil {
