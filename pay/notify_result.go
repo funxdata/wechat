@@ -90,10 +90,12 @@ func (pcf *Pay) VerifySign(notifyRes NotifyResult) bool {
 		if k == "sign" {
 			continue
 		}
+
 		sortedKeys = append(sortedKeys, k)
 	}
 	sort.Strings(sortedKeys)
-	// STEP2, 对key=value的键值对用&连接起来，略过空值
+
+	// STEP2, 对key=value的键值对用&连接起来，略过空值 & sign
 	var signStrings string
 	for _, k := range sortedKeys {
 		value := notifyRes[k]
@@ -101,8 +103,10 @@ func (pcf *Pay) VerifySign(notifyRes NotifyResult) bool {
 			signStrings = signStrings + k + "=" + value + "&"
 		}
 	}
+
 	// STEP3, 在键值对的最后加上key=API_KEY
 	signStrings = signStrings + "key=" + pcf.PayKey
+
 	// STEP4, 进行MD5签名并且将所有字符转为大写.
 	sign := util.MD5Sum(signStrings)
 	if sign != notifyRes["sign"] {
