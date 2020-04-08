@@ -1,4 +1,4 @@
-fork from [silenceper/wechat](https://github.com/funxdata/wechat)
+fork from [silenceper/wechat](https://github.com/silenceper/wechat)
 
 # WeChat SDK for Go
 [![Build Status](https://travis-ci.org/silenceper/wechat.svg?branch=master)](https://travis-ci.org/silenceper/wechat)
