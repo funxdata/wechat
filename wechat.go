@@ -57,6 +57,21 @@ func copyConfigToContext(cfg *Config, context *context.Context) {
 	context.SetJsAPITicketLock(new(sync.RWMutex))
 }
 
+// Copy 深度拷贝资源
+func (wc *Wechat) Copy() *Wechat {
+	cfg := &Config{
+		AppID:          wc.Context.AppID,
+		AppSecret:      wc.Context.AppSecret,
+		Token:          wc.Context.Token,
+		EncodingAESKey: wc.Context.EncodingAESKey,
+		PayMchID:       wc.Context.PayMchID,
+		PayNotifyURL:   wc.Context.PayNotifyURL,
+		PayKey:         wc.Context.PayKey,
+		Cache:          wc.Context.Cache,
+	}
+	return NewWechat(cfg)
+}
+
 // GetServer 消息管理
 func (wc *Wechat) GetServer(req *http.Request, writer http.ResponseWriter) *server.Server {
 	wc.Context.Request = req
